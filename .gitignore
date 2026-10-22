@@ -1,0 +1,20 @@
+# Environment secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Local data and logs
+*.log
+
+# Local backup and temporary files
+*.backup
+*.before-monitoring
+127.0.0.1:5050
+
+# IDE and operating system
+.vscode/
+.idea/
+.DS_Store
