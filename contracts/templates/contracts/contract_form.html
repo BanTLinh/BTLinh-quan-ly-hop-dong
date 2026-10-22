@@ -1,0 +1,217 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if is_edit %}Chỉnh sửa: {{ contract.code }}{% else %}Tạo hợp đồng mới{% endif %} &bull; Hệ thống Quản lý Hợp đồng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sidebar-start: #1b1647;
+      --sidebar-mid: #161e4f;
+      --sidebar-end: #0f172a;
+      --canvas-bg: #edf3fa;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --radius-xl: 20px;
+      --radius-md: 12px;
+      --shadow-card: 0 10px 25px -5px rgba(15, 23, 42, 0.05);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      background-color: var(--canvas-bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      font-size: 14px;
+    }
+    a { color: inherit; text-decoration: none; }
+    .app-layout { display: flex; width: 100%; min-height: 100vh; }
+    
+    .sidebar {
+      width: 295px;
+      background: linear-gradient(180deg, var(--sidebar-start) 0%, var(--sidebar-mid) 40%, var(--sidebar-end) 100%);
+      color: #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      padding: 22px 16px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+    .brand-section { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; min-width: 0; }
+    .brand-logo {
+      width: 38px; height: 38px; border-radius: 11px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      display: flex; align-items: center; justify-content: center; color: #fff;
+      flex-shrink: 0; box-shadow: 0 6px 16px rgba(14, 165, 233, 0.4);
+    }
+    .brand-text {
+      min-width: 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .brand-name { font-size: 13.5px; font-weight: 800; line-height: 1.25; color: #fff; white-space: nowrap; margin: 0; }
+    .brand-sub { font-size: 10.5px; color: #93c5fd; font-weight: 600; margin-top: 2px; white-space: nowrap; }
+    .nav-link {
+      display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+      border-radius: 12px; color: #94a3b8; font-weight: 600; margin-bottom: 4px;
+    }
+    .nav-link:hover, .nav-link.active {
+      background: rgba(255, 255, 255, 0.1); color: #fff;
+    }
+
+    .main-wrap { flex: 1; padding: 28px 36px; overflow-y: auto; }
+    .form-card {
+      background: #fff; border-radius: var(--radius-xl);
+      border: 1px solid var(--card-border); box-shadow: var(--shadow-card);
+      max-width: 860px; margin: 0 auto; overflow: hidden;
+    }
+    .form-header {
+      padding: 24px 32px; border-bottom: 1px solid var(--card-border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .form-title { font-size: 20px; font-weight: 800; color: #0f172a; }
+    .form-body { padding: 32px; }
+
+    .form-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    
+    label { font-size: 12.5px; font-weight: 700; color: #334155; }
+    label .req { color: #ef4444; }
+    
+    input[type="text"], input[type="date"], input[type="number"], select, textarea {
+      width: 100%; height: 42px; padding: 0 14px;
+      border: 1.5px solid #cbd5e1; border-radius: var(--radius-md);
+      font-size: 13px; font-family: inherit; outline: none; background: #f8fafc;
+      transition: all 0.2s;
+    }
+    textarea { height: 110px; padding: 12px 14px; resize: vertical; }
+    input:focus, select:focus, textarea:focus {
+      border-color: #2563eb; background: #fff; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+    .input-error { border-color: #ef4444 !important; background: #fff5f5 !important; }
+    .err-msg { font-size: 11.5px; color: #ef4444; font-weight: 600; margin-top: 3px; }
+
+    .form-actions {
+      display: flex; align-items: center; justify-content: flex-end; gap: 12px;
+      border-top: 1px solid var(--card-border); padding-top: 24px; margin-top: 10px;
+    }
+    .btn {
+      padding: 10px 22px; border-radius: 10px; font-size: 13.5px; font-weight: 700;
+      border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-cancel { background: #f1f5f9; color: #475569; }
+    .btn-submit { background: #2563eb; color: #fff; }
+    .btn-submit:hover { background: #1d4ed8; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="brand-section">
+        <div class="brand-logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-name">Hệ thống quản lý hợp đồng</div>
+          <div class="brand-sub">Quản lý hợp đồng thông minh</div>
+        </div>
+      </div>
+      <nav>
+        <a class="nav-link" href="/"><span>&larr;</span> <span>Về Dashboard</span></a>
+        <a class="nav-link active" href="#"><span>✏️</span> <span>{% if is_edit %}Chỉnh sửa hợp đồng{% else %}Thêm hợp đồng mới{% endif %}</span></a>
+      </nav>
+    </aside>
+
+    <main class="main-wrap">
+      <div class="form-card">
+        <div class="form-header">
+          <h1 class="form-title">{% if is_edit %}Chỉnh sửa hợp đồng: {{ contract.code }}{% else %}Thêm hợp đồng mới{% endif %}</h1>
+          <a href="/" style="font-size: 12.5px; color: var(--text-muted); font-weight: 600;">&times; Đóng</a>
+        </div>
+        <div class="form-body">
+          <form method="POST">
+            {% csrf_token %}
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Mã hợp đồng <span class="req">*</span></label>
+                <input type="text" name="code" value="{% if is_edit %}{{ contract.code }}{% else %}{{ contract.code|default:'' }}{% endif %}" placeholder="Ví dụ: HD-2026-005" {% if is_edit %}readonly style="background:#e2e8f0; cursor:not-allowed;"{% endif %} class="{% if errors.code %}input-error{% endif %}">
+                {% if errors.code %}<span class="err-msg">{{ errors.code }}</span>{% endif %}
+              </div>
+
+              <div class="form-group">
+                <label>Đối tác ký kết <span class="req">*</span></label>
+                <input type="text" name="partner" value="{% if is_edit %}{{ contract.partner }}{% else %}{{ contract.partner|default:'' }}{% endif %}" placeholder="Tên công ty / khách hàng đối tác" class="{% if errors.partner %}input-error{% endif %}">
+                {% if errors.partner %}<span class="err-msg">{{ errors.partner }}</span>{% endif %}
+              </div>
+
+              <div class="form-group full">
+                <label>Tên hợp đồng <span class="req">*</span></label>
+                <input type="text" name="name" value="{% if is_edit %}{{ contract.name }}{% else %}{{ contract.name|default:'' }}{% endif %}" placeholder="Ví dụ: Hợp đồng cung cấp dịch vụ công nghệ thông tin" class="{% if errors.name %}input-error{% endif %}">
+                {% if errors.name %}<span class="err-msg">{{ errors.name }}</span>{% endif %}
+              </div>
+
+              <div class="form-group">
+                <label>Giá trị hợp đồng (VNĐ) <span class="req">*</span></label>
+                <input type="text" name="value" value="{% if is_edit %}{{ contract.value }}{% else %}{{ contract.value|default:'0' }}{% endif %}" placeholder="50000000" class="{% if errors.value %}input-error{% endif %}">
+                {% if errors.value %}<span class="err-msg">{{ errors.value }}</span>{% endif %}
+              </div>
+
+              <div class="form-group">
+                <label>Trạng thái hợp đồng</label>
+                <select name="status">
+                  {% for s_val, s_lbl in status_choices %}
+                    <option value="{{ s_val }}" {% if is_edit and contract.status == s_val %}selected{% elif not is_edit and s_val == 'DRAFT' %}selected{% endif %}>{{ s_lbl }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Ngày ký</label>
+                <input type="date" name="signed_date" value="{% if is_edit %}{{ contract.signed_date|date:'Y-m-d' }}{% else %}{{ contract.signed_date|default:'' }}{% endif %}">
+              </div>
+
+              <div class="form-group">
+                <label>Ngày có hiệu lực</label>
+                <input type="date" name="effective_date" value="{% if is_edit %}{{ contract.effective_date|date:'Y-m-d' }}{% else %}{{ contract.effective_date|default:'' }}{% endif %}">
+              </div>
+
+              <div class="form-group full">
+                <label>Ngày hết hạn</label>
+                <input type="date" name="expiry_date" value="{% if is_edit %}{{ contract.expiry_date|date:'Y-m-d' }}{% else %}{{ contract.expiry_date|default:'' }}{% endif %}">
+              </div>
+
+              <div class="form-group full">
+                <label>Nội dung mô tả chi tiết</label>
+                <textarea name="description" placeholder="Nhập các điều khoản, thỏa thuận hoặc ghi chú quan trọng...">{% if is_edit %}{{ contract.description }}{% else %}{{ contract.description|default:'' }}{% endif %}</textarea>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <a class="btn btn-cancel" href="{% if is_edit %}/contracts/{{ contract.id }}/{% else %}/{% endif %}">Hủy bỏ</a>
+              <button class="btn btn-submit" type="submit">💾 Lưu hợp đồng</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

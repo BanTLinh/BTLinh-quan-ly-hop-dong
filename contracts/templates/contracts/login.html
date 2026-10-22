@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập &bull; Hệ thống Quản lý Hợp đồng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --radius-xl: 24px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      position: relative;
+      overflow-x: hidden;
+      color: var(--text-main);
+    }
+
+    /* Ambient background glows */
+    body::before {
+      content: '';
+      position: absolute;
+      width: 550px;
+      height: 550px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.22) 0%, transparent 70%);
+      top: -120px;
+      left: 15%;
+      pointer-events: none;
+    }
+
+    body::after {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.18) 0%, transparent 70%);
+      bottom: -100px;
+      right: 15%;
+      pointer-events: none;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 500px;
+      background: var(--card-bg);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.15);
+      padding: 38px 36px 32px;
+      position: relative;
+      z-index: 10;
+      animation: cardAppear 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes cardAppear {
+      from { opacity: 0; transform: translateY(18px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .brand-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .brand-icon-box {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+      box-shadow: 0 12px 24px -6px rgba(99, 102, 241, 0.45);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      margin-bottom: 14px;
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.4px;
+      margin-bottom: 5px;
+    }
+
+    .brand-desc {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+
+    .alert-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #fef2f2;
+      border: 1px solid #fee2e2;
+      border-left: 4px solid #f43f5e;
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      color: #991b1b;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .alert-icon {
+      flex-shrink: 0;
+      margin-top: 1px;
+      color: #f43f5e;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 15px;
+      color: #94a3b8;
+      pointer-events: none;
+      transition: color 0.2s;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 46px;
+      padding: 0 16px 0 44px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: var(--radius-md);
+      font-size: 13.5px;
+      font-family: inherit;
+      color: #0f172a;
+      background: #f8fafc;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    .form-input:focus {
+      background: #ffffff;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16);
+    }
+
+    .form-input:focus + .input-icon,
+    .input-wrapper:focus-within .input-icon {
+      color: #6366f1;
+    }
+
+    .btn-submit {
+      width: 100%;
+      height: 48px;
+      background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+      border: none;
+      border-radius: var(--radius-md);
+      color: #ffffff;
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.45);
+      transition: all 0.2s ease;
+      margin-top: 6px;
+    }
+
+    .btn-submit:hover {
+      background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
+      box-shadow: 0 14px 26px -6px rgba(79, 70, 229, 0.55);
+      transform: translateY(-1px);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    /* =========================================================
+       KHU VỰC TÀI KHOẢN DÙNG THỬ (DEMO ACCOUNTS)
+       ========================================================= */
+    .demo-accounts-wrap {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px dashed #cbd5e1;
+    }
+
+    .demo-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .demo-title {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .demo-hint {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .demo-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .demo-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .demo-card:hover {
+      background: #ffffff;
+      border-color: #cbd5e1;
+      box-shadow: 0 4px 14px -3px rgba(15, 23, 42, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .demo-card-left {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .demo-role-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+    }
+
+    .demo-role-badge {
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .demo-role-badge.badge-manager {
+      background: #e0e7ff;
+      color: #4338ca;
+    }
+
+    .demo-role-badge.badge-staff {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .demo-desc {
+      font-size: 11px;
+      color: #64748b;
+      line-height: 1.35;
+    }
+
+    .demo-credentials-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .demo-cred-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: #475569;
+    }
+
+    .demo-cred-lbl {
+      font-weight: 600;
+    }
+
+    .demo-cred-val {
+      background: #e2e8f0;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .btn-fill {
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      padding: 7px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #2563eb;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    .btn-fill:hover {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+    }
+
+    .btn-fill:active {
+      transform: scale(0.97);
+    }
+
+    .demo-security-note {
+      margin-top: 12px;
+      font-size: 11px;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      line-height: 1.4;
+    }
+
+    .card-footer {
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 11.5px;
+      color: #94a3b8;
+    }
+
+    /* Responsive cho điện thoại di động */
+    @media (max-width: 480px) {
+      .login-card {
+        padding: 26px 18px 22px;
+        border-radius: 18px;
+      }
+      .brand-title {
+        font-size: 18px;
+      }
+      .demo-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .demo-credentials-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+      .btn-fill {
+        width: 100%;
+        justify-content: center;
+        padding: 8px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="login-card">
+    <div class="brand-header">
+      <div class="brand-icon-box" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+      </div>
+      <h1 class="brand-title">HỆ THỐNG QUẢN LÝ HỢP ĐỒNG</h1>
+      <p class="brand-desc">Đăng nhập tài khoản để vào Hệ thống Quản lý Hợp đồng</p>
+    </div>
+
+    {% if form.errors or error %}
+      <div class="alert-box" role="alert">
+        <svg class="alert-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <div>Tên đăng nhập hoặc mật khẩu chưa chính xác. Vui lòng kiểm tra lại.</div>
+      </div>
+    {% endif %}
+
+    {% if next and user.is_authenticated %}
+      <div class="alert-box" role="alert">
+        <svg class="alert-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <div>Tài khoản hiện tại không có quyền truy cập trang này.</div>
+      </div>
+    {% endif %}
+
+    <form method="post" autocomplete="on" id="loginForm">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+
+      <div class="form-group">
+        <label class="form-label" for="id_username">Tên đăng nhập</label>
+        <div class="input-wrapper">
+          <span class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </span>
+          <input class="form-input" id="id_username" name="username" type="text" autocomplete="username" required autofocus placeholder="Nhập tên đăng nhập...">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="id_password">Mật khẩu</label>
+        <div class="input-wrapper">
+          <span class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </span>
+          <input class="form-input" id="id_password" name="password" type="password" autocomplete="current-password" required placeholder="Nhập mật khẩu của bạn...">
+        </div>
+      </div>
+
+      <button class="btn-submit" type="submit">
+        <span>Đăng nhập hệ thống</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+    </form>
+
+    {% if demo_accounts %}
+      {# Khu vực Tài khoản dùng thử: Chỉ hiển thị trong môi trường phát triển/demo nội bộ #}
+      <section class="demo-accounts-wrap" aria-label="Tài khoản dùng thử">
+        <div class="demo-header">
+          <div class="demo-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="8.5" cy="7" r="4"></circle>
+              <line x1="20" y1="8" x2="20" y2="14"></line>
+              <line x1="23" y1="11" x2="17" y2="11"></line>
+            </svg>
+            <span>Tài khoản dùng thử</span>
+          </div>
+          <span class="demo-hint">Nhấn nút để điền thông tin</span>
+        </div>
+
+        <div class="demo-list">
+          {% for acc in demo_accounts %}
+            <div class="demo-card">
+              <div class="demo-card-left">
+                <div class="demo-role-row">
+                  <span class="demo-role-badge {{ acc.badge_class }}">{{ acc.role_name }}</span>
+                  <span class="demo-desc">{{ acc.desc }}</span>
+                </div>
+                <div class="demo-credentials-row">
+                  <div class="demo-cred-item">
+                    <span class="demo-cred-lbl">Tài khoản:</span>
+                    <code class="demo-cred-val">{{ acc.username }}</code>
+                  </div>
+                  <div class="demo-cred-item">
+                    <span class="demo-cred-lbl">Mật khẩu:</span>
+                    <code class="demo-cred-val">{{ acc.password }}</code>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="btn-fill" data-username="{{ acc.username }}" data-password="{{ acc.password }}" title="Điền tài khoản & mật khẩu '{{ acc.username }}' vào form">
+                <span>Điền tài khoản</span>
+                <span>&rarr;</span>
+              </button>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="demo-security-note">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span>Môi trường demo nội bộ (DEBUG=True). Không hiển thị tài khoản quản trị hay người dùng thật.</span>
+        </div>
+      </section>
+    {% endif %}
+
+    <div class="card-footer">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      </svg>
+      <span>Bảo mật phân quyền &bull; Hệ thống Quản lý Hợp đồng &copy; 2026</span>
+    </div>
+  </main>
+
+  <script>
+    // Xử lý tự điền tên đăng nhập & mật khẩu khi nhấn nút "Điền tài khoản"
+    // KHÔNG tự động đăng nhập - chỉ điền vào form để người dùng kiểm tra rồi tự bấm Đăng nhập
+    document.querySelectorAll('.btn-fill').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        var username = this.getAttribute('data-username');
+        var password = this.getAttribute('data-password');
+        var usernameInput = document.getElementById('id_username');
+        var passwordInput = document.getElementById('id_password');
+        var submitBtn = document.querySelector('.btn-submit');
+
+        if (usernameInput) {
+          usernameInput.value = username;
+          usernameInput.style.borderColor = '#6366f1';
+          usernameInput.style.backgroundColor = '#eef2ff';
+        }
+
+        if (passwordInput) {
+          passwordInput.value = password;
+          passwordInput.style.borderColor = '#6366f1';
+          passwordInput.style.backgroundColor = '#eef2ff';
+        }
+
+        setTimeout(function() {
+          if (usernameInput) {
+            usernameInput.style.borderColor = '';
+            usernameInput.style.backgroundColor = '';
+          }
+          if (passwordInput) {
+            passwordInput.style.borderColor = '';
+            passwordInput.style.backgroundColor = '';
+          }
+        }, 600);
+
+        // Chuyển focus đến nút đăng nhập để người dùng chủ động nhấn
+        if (submitBtn) {
+          submitBtn.focus();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

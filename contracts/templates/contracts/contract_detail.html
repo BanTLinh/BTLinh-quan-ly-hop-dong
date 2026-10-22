@@ -1,0 +1,268 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ contract.code }} &bull; Chi tiết hợp đồng &bull; Hệ thống Quản lý Hợp đồng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sidebar-start: #1b1647;
+      --sidebar-mid: #161e4f;
+      --sidebar-end: #0f172a;
+      --canvas-bg: #edf3fa;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --radius-xl: 20px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --shadow-card: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      background-color: var(--canvas-bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      font-size: 14px;
+    }
+    a { color: inherit; text-decoration: none; }
+    .app-layout { display: flex; width: 100%; min-height: 100vh; }
+    
+    /* Sidebar */
+    .sidebar {
+      width: 295px;
+      background: linear-gradient(180deg, var(--sidebar-start) 0%, var(--sidebar-mid) 40%, var(--sidebar-end) 100%);
+      color: #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      padding: 22px 16px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+    .brand-section { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; min-width: 0; }
+    .brand-logo {
+      width: 38px; height: 38px; border-radius: 11px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      display: flex; align-items: center; justify-content: center; color: #fff;
+      flex-shrink: 0; box-shadow: 0 6px 16px rgba(14, 165, 233, 0.4);
+    }
+    .brand-text {
+      min-width: 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .brand-name { font-size: 13.5px; font-weight: 800; line-height: 1.25; color: #fff; white-space: nowrap; margin: 0; }
+    .brand-sub { font-size: 10.5px; color: #93c5fd; font-weight: 600; margin-top: 2px; white-space: nowrap; }
+    .nav-link {
+      display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+      border-radius: 12px; color: #94a3b8; font-weight: 600; margin-bottom: 4px;
+      transition: all 0.2s;
+    }
+    .nav-link:hover, .nav-link.active {
+      background: rgba(255, 255, 255, 0.1); color: #fff;
+    }
+
+    /* Main Area */
+    .main-wrap { flex: 1; padding: 28px 36px; overflow-y: auto; }
+    .top-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .breadcrumb { font-size: 13px; color: var(--text-muted); font-weight: 600; }
+    .breadcrumb a { color: #2563eb; }
+    .user-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #fff; padding: 6px 14px; border-radius: 20px;
+      border: 1px solid var(--card-border); font-size: 12.5px; font-weight: 700;
+    }
+    .role-badge {
+      padding: 2px 8px; border-radius: 12px; font-size: 10.5px;
+      background: #e0e7ff; color: #4338ca;
+    }
+
+    /* Card Content */
+    .detail-card {
+      background: #fff; border-radius: var(--radius-xl);
+      border: 1px solid var(--card-border); box-shadow: var(--shadow-card);
+      overflow: hidden;
+    }
+    .detail-header {
+      padding: 28px 32px; border-bottom: 1px solid var(--card-border);
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 20px; flex-wrap: wrap;
+    }
+    .contract-title { font-size: 22px; font-weight: 800; color: #0f172a; margin-top: 6px; }
+    .code-tag {
+      display: inline-block; padding: 3px 10px; border-radius: 8px;
+      background: #f1f5f9; color: #334155; font-size: 12px; font-weight: 700;
+    }
+    .status-badge {
+      display: inline-block; padding: 6px 14px; border-radius: 20px;
+      font-size: 12px; font-weight: 800;
+    }
+    .status-badge.ACTIVE { background-color: #dcfce7; color: #15803d; }
+    .status-badge.EXPIRED { background-color: #fee2e2; color: #b91c1c; }
+    .status-badge.DRAFT { background-color: #fef3c7; color: #b45309; }
+    .status-badge.TERMINATED { background-color: #f1f5f9; color: #475569; }
+
+    .header-actions { display: flex; align-items: center; gap: 10px; }
+    .btn {
+      padding: 9px 18px; border-radius: 10px; font-size: 13px; font-weight: 700;
+      border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-secondary { background: #f1f5f9; color: #334155; }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-primary { background: #2563eb; color: #fff; }
+    .btn-primary:hover { background: #1d4ed8; }
+
+    .detail-body { padding: 32px; }
+    .info-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px; margin-bottom: 32px;
+    }
+    .info-item {
+      background: #f8fafc; padding: 18px 20px; border-radius: var(--radius-md);
+      border: 1px solid #f1f5f9;
+    }
+    .info-label { font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
+    .info-value { font-size: 15px; font-weight: 700; color: var(--text-main); }
+    .info-value.amount { font-size: 20px; color: #2563eb; font-weight: 800; }
+
+    .desc-box {
+      background: #f8fafc; border-radius: var(--radius-md); padding: 22px;
+      border: 1px solid #f1f5f9; margin-bottom: 24px;
+    }
+    .desc-title { font-size: 13px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; }
+    .desc-content { font-size: 13.5px; color: #334155; line-height: 1.7; white-space: pre-line; }
+
+    .meta-footer {
+      display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);
+      border-top: 1px solid #f1f5f9; padding-top: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand-section">
+        <div class="brand-logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-name">Hệ thống quản lý hợp đồng</div>
+          <div class="brand-sub">Quản lý hợp đồng thông minh</div>
+        </div>
+      </div>
+      <nav style="display: flex; flex-direction: column; gap: 4px;">
+        <a class="nav-link" href="/">
+          <span>&larr;</span> <span>Về Dashboard</span>
+        </a>
+        <a class="nav-link active" href="#">
+          <span>📄</span> <span>Chi tiết hợp đồng</span>
+        </a>
+      </nav>
+      <div style="margin-top: auto; padding: 16px 12px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+        <div style="font-size: 11px; color: #94a3b8;">Tài khoản:</div>
+        <div style="font-weight: 700; color: #fff;">{{ request.user.username }}</div>
+        <div style="font-size: 11px; color: #38bdf8;">{{ user_role }}</div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-wrap">
+      <div class="top-header">
+        <div class="breadcrumb">
+          <a href="/">Dashboard</a> &rsaquo; <span>Hợp đồng</span> &rsaquo; <strong>{{ contract.code }}</strong>
+        </div>
+        <div class="user-pill">
+          <span>👤 {{ request.user.get_full_name|default:request.user.username }}</span>
+          <span class="role-badge">{{ user_role }}</span>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-header">
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+              <span class="code-tag">{{ contract.code }}</span>
+              <span class="status-badge {{ contract.status }}">{{ contract.get_status_display }}</span>
+            </div>
+            <h1 class="contract-title">{{ contract.name }}</h1>
+          </div>
+          <div class="header-actions">
+            <a class="btn btn-secondary" href="/">&larr; Quay lại danh sách</a>
+            {% if can_edit %}
+              <a class="btn btn-primary" href="/contracts/{{ contract.id }}/edit/">✏️ Chỉnh sửa</a>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="detail-body">
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Đối tác ký kết</div>
+              <div class="info-value">🏢 {{ contract.partner }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Giá trị hợp đồng</div>
+              <div class="info-value amount">{{ contract.value|intcomma }} VNĐ</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Ngày ký</div>
+              <div class="info-value">📅 {{ contract.signed_date|date:"d/m/Y"|default:"Chưa ký" }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Ngày có hiệu lực</div>
+              <div class="info-value">📅 {{ contract.effective_date|date:"d/m/Y"|default:"Chưa kích hoạt" }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Ngày hết hạn</div>
+              <div class="info-value">⏳ {{ contract.expiry_date|date:"d/m/Y"|default:"Không thời hạn" }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Trạng thái hồ sơ</div>
+              <div class="info-value">
+                <span class="status-badge {{ contract.status }}">{{ contract.get_status_display }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="desc-box">
+            <div class="desc-title">NỘI DUNG VÀ ĐIỀU KHOẢN HỢP ĐỒNG</div>
+            <div class="desc-content">{{ contract.description|default:"Chưa có nội dung mô tả chi tiết." }}</div>
+          </div>
+
+          {% if user_role == "CUSTOMER" %}
+            <div style="background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 14px 18px; border-radius: 12px; font-size: 13px; margin-bottom: 20px;">
+              🛡️ <strong>Xác nhận quyền sở hữu:</strong> Hợp đồng này được cấp quyền xem riêng cho khách hàng đại diện <strong>{{ partner_name }}</strong>. Dữ liệu được bảo vệ an toàn theo chính sách phân quyền ContractPro.
+            </div>
+          {% endif %}
+
+          <div class="meta-footer">
+            <span>Ngày tạo trên hệ thống: {{ contract.created_at|date:"d/m/Y H:i:s" }}</span>
+            <span>Cập nhật gần nhất: {{ contract.updated_at|date:"d/m/Y H:i:s" }}</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

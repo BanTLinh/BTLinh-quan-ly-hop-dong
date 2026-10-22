@@ -1,20 +1,44 @@
 # Environment secrets
 .env
+.env.*
+!.env.example
 
 # Python
 __pycache__/
 *.py[cod]
 .venv/
+venv/
 
 # Local data and logs
 *.log
+db.sqlite3
+media/
 
 # Local backup and temporary files
+*.bak
 *.backup
-*.before-monitoring
+*.before-*
+*.broken-backup
+backup_*/
+backups/
+docker-compose.yml.backup
+docker-compose.yml.before-monitoring
 127.0.0.1:5050
 
 # IDE and operating system
 .vscode/
 .idea/
 .DS_Store
+
+# All backup variants
+*.bak*
+*.broken-backup
+/Báo cáo TK và QT HTPM.docx
+
+# Temporary files and local backups
+*.bak
+*.bak_*
+*.before-*
+*.broken-backup
+__pycache__/
+*.py[cod]
